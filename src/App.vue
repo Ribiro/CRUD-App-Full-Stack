@@ -1,47 +1,75 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div class="container mt-4">
+    <!-- title  -->
+    <h1 class="title center-heading">
+      <span>Icon </span>
+      Phone Book App
+    </h1>
+    <!-- end of title  -->
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <!-- subtitle and add button  -->
+    <div class="columns is-mobile mt-4">
+      <div class="column is-half">
+        <h2 class="subtitle">Contacts</h2>
+      </div>
+      <div class="column is-half has-text-right">
+        <button class="button is-link">Add Contact</button>
+      </div>
     </div>
-  </header>
+    <!-- end of subtitle and add button  -->
 
-  <main>
-    <TheWelcome />
-  </main>
+    <!-- search bar -->
+    <div class="field mt-4">
+      <div class="control has-icons-left has-icons-right">
+        <input class="input" type="text" placeholder="Search for contact by last name ...">
+        <span class="icon is-small is-left">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+    </div>
+    <!-- end of search bar  -->
+
+    <!-- card -->
+    <div class="card mt-4">
+      <div class="card-content">
+        <div class="columns is-mobile">
+          <div class="column is-two-thirds">
+            <div>
+              <h1 class="subtitle">Contact Name</h1>
+            </div>
+            <div class="mt-2">
+              <h1>+254712353637</h1>
+            </div>
+          </div>
+          <div class="column is-one-third has-text-right">
+            <span>
+              <button class="button is-info">
+                Update
+              </button>
+            </span>
+            <span class="ml-2">
+              <button class="button is-danger">Delete</button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end of card -->
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<style>
+@import 'bulma/css/bulma.min.css';
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+
+.container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.center-heading {
+  text-align: center;
 }
 </style>
