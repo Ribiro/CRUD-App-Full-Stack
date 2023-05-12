@@ -10,6 +10,15 @@
       </span>
     </h1>
     <!-- end of title  -->
+    <div v-if="SuccessAddingContact" class="notification is-success fa-sm">
+      <button @click="this.SuccessAddingContact=false" class="delete"></button>
+      Contact Added Successfully
+    </div>
+
+    <div v-if="SuccessDeletingContact" class="notification is-danger fa-sm">
+      <button @click="this.SuccessDeletingContact=false" class="delete"></button>
+      Contact Deleted Successfully
+    </div>
 
     <!-- subtitle and add button  -->
     <div class="columns is-mobile mt-4">
@@ -17,7 +26,7 @@
         <h2 class="subtitle">Contacts</h2>
       </div>
       <div class="column is-half has-text-right">
-        <button class="button is-link">
+        <button class="button is-link" @click="showAddModal">
           <span class="icon">
             <i class="fas fa-plus"></i>
           </span>
@@ -28,6 +37,41 @@
       </div>
     </div>
     
+    <div class="modal" style="padding: 4px;" :class="{ 'is-active': showModal }">
+      <div class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">Add Contact</p>
+            <button @click="showModal = false" class="delete" aria-label="close"></button>
+          </header>
+          <form @submit.prevent="addContact">
+            <section class="modal-card-body">
+              <div class="field">
+                <label class="label">First Name</label>
+                <div class="control">
+                  <input v-model="first_name" required class="input" type="text" placeholder="Enter Contact's First Name">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Last Name</label>
+                <div class="control">
+                  <input v-model="last_name" required class="input" type="text" placeholder="Enter Contact's Last Name">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Phone Number</label>
+                <div class="control">
+                  <input v-model="phone_number" required class="input" type="text" placeholder="Enter Contact's Phone Number">
+                </div>
+              </div>
+          </section>
+          <footer class="modal-card-foot">
+            <button class="button is-link">Add Contact</button>
+            <!-- <button @click="showModal = false" class="button">Cancel</button> -->
+          </footer>
+          </form>
+        </div>
+    </div>
     
     <!-- end of subtitle and add button  -->
 
@@ -75,7 +119,7 @@
                 </button>
               </span>
               <span class="ml-2">
-                <button class="button is-danger">
+                <button @click="deleteContact(contact.id)" class="button is-danger">
                   <span class="icon">
                     <i class="fas fa-trash-alt"></i>
                   </span>
@@ -106,6 +150,13 @@ export default {
   setup() {
     // contacts
     const contacts = ref ([])
+    const showModal = ref(false)
+    const SuccessAddingContact = ref(false)
+    const SuccessDeletingContact = ref(false)
+
+    const first_name = ref('')
+    const last_name = ref('')
+    const phone_number = ref('')
 
     onMounted(()=>{
       onSnapshot(contactsCollectionQuery, (querySnapshot) => {
@@ -124,7 +175,32 @@ export default {
       })
     })
 
-    return { contacts }
+    return { contacts, showModal, first_name, last_name, phone_number, SuccessAddingContact, SuccessDeletingContact }
+  },
+  methods: {
+    addContact(){
+      addDoc(contactsRef, {
+        first_name: this.first_name,
+        last_name: this.last_name,
+        phone_number: this.phone_number
+      })
+      this.first_name = '';
+      this.last_name = '';
+      this.phone_number = '';
+      this.showModal = false;
+      this.SuccessAddingContact = true;
+    },
+
+    deleteContact(id){
+      deleteDoc(doc(contactsRef, id));
+      this.SuccessDeletingContact = true;
+    },
+
+    showAddModal(){
+      this.showModal = true;
+      this.SuccessAddingContact = false;
+      this.SuccessDeletingContact = false;
+    }
   },
 }
 
