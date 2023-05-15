@@ -1,4 +1,7 @@
 <template>
+  <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  </head>
   <div class="container mt-4">
     <!-- title  -->
     <h1 class="title center-heading">
@@ -85,14 +88,18 @@
       <div class="control has-icons-left has-icons-right">
         <input v-model="searchTerm" class="input" type="text" placeholder="Search for contact by last name ...">
         <span class="icon is-small is-left">
-          <i class="fas fa-search-plus"></i>
+          <i class="material-icons">search</i>
         </span>
       </div>
     </div>
     <!-- end of search bar  -->
 
+    <div v-if="loading">
+      <progress class="progress is-small is-primary" max="100">Loading ...</progress>
+    </div>
+
     <!-- card -->
-    <div v-if="isFilteredDataEmpty" style="display: flex; align-items: center; justify-content: center;">
+    <div v-if="isFilteredDataEmpty && !loading" style="display: flex; align-items: center; justify-content: center;">
       <h3>No Contacts Available!</h3>
     </div>
 
@@ -112,8 +119,8 @@
               </div>
               <div class="mt-2">
                 <h1>
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-phone-square-alt"></i>
+                  <span class="icon is-left">
+                    <i class="material-icons">phone</i>
                   </span>
                   {{contact.phone_number}}
                 </h1>
@@ -123,7 +130,7 @@
               <span class="mb-2">
                 <button @click="contact.showEditModal = true" class="button is-info">
                   <span class="icon">
-                    <i class="fas fa-pencil"></i>
+                    <i class="material-icons">update</i>
                   </span>
                 </button>
               </span>
@@ -133,7 +140,7 @@
                 <div class="modal-background"></div>
                 <div class="modal-card">
                   <header class="modal-card-head">
-                    <p class="modal-card-title is-left">Update {{contact.first_name}} {{ contact.last_name }}</p>
+                    <p class="modal-card-title is-left">Update Contact Information</p>
                     <button @click="contact.showEditModal = false" class="delete" aria-label="close"></button>
                   </header>
                   <form @submit.prevent="updateContact(contact.id)">
@@ -203,6 +210,7 @@ export default {
     const SuccessEditingContact = ref(false)
     const SuccessDeletingContact = ref(false)
     const searchTerm = ref('')
+    const loading = ref(true)
 
     const first_name = ref('')
     const last_name = ref('')
@@ -221,13 +229,13 @@ export default {
         fetchedContacts.push(contact)
         })
         contacts.value = fetchedContacts
-        console.log(contacts)
+        loading.value = false
       })
     })
 
     return { contacts, showModal, first_name, 
       last_name, phone_number, SuccessAddingContact, 
-      SuccessDeletingContact, showEditModal, SuccessEditingContact, searchTerm 
+      SuccessDeletingContact, showEditModal, SuccessEditingContact, searchTerm, loading
     }
   },
   computed: {
@@ -312,5 +320,9 @@ export default {
 
 .modal-card-body {
   text-align: left !important;
+}
+
+.material-icons {
+  font-size: 2em;
 }
 </style>
