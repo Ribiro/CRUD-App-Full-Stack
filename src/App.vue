@@ -20,6 +20,11 @@
       Contact Deleted Successfully
     </div>
 
+    <div v-if="SuccessEditingContact" class="notification is-success fa-sm">
+      <button @click="this.SuccessEditingContact=false" class="delete"></button>
+      Contact Updated Successfully
+    </div>
+
     <!-- subtitle and add button  -->
     <div class="columns is-mobile mt-4">
       <div class="column is-half">
@@ -112,12 +117,50 @@
             </div>
             <div class="column is-one-third has-text-right">
               <span class="mb-2">
-                <button class="button is-info">
+                <button @click="contact.showEditModal = true" class="button is-info">
                   <span class="icon">
                     <i class="fas fa-pencil"></i>
                   </span>
                 </button>
               </span>
+
+              <!-- update modal  -->
+              <div class="modal" style="padding: 4px;" :class="{ 'is-active': contact.showEditModal }">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title is-left">Update {{contact.first_name}} {{ contact.last_name }}</p>
+                    <button @click="contact.showEditModal = false" class="delete" aria-label="close"></button>
+                  </header>
+                  <form @submit.prevent="updateContact(contact.id)">
+                    <section class="modal-card-body">
+                      <div class="field">
+                        <label class="label">First Name</label>
+                        <div class="control">
+                          <input v-model="contact.first_name" required class="input" type="text" placeholder="Enter Contact's First Name">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label class="label">Last Name</label>
+                        <div class="control">
+                          <input v-model="contact.last_name" required class="input" type="text" placeholder="Enter Contact's Last Name">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label class="label">Phone Number</label>
+                        <div class="control">
+                          <input v-model="contact.phone_number" required class="input" type="text" placeholder="Enter Contact's Phone Number">
+                        </div>
+                      </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                      <button class="button is-link">Update Contact</button>
+                    </footer>
+                  </form>
+                </div>
+              </div>
+
+              <!-- end of update modal  -->
               <span class="ml-2">
                 <button @click="deleteContact(contact.id)" class="button is-danger">
                   <span class="icon">
@@ -139,7 +182,7 @@ import {ref, onMounted} from 'vue';
 import { 
   collection, onSnapshot, 
   addDoc, doc, deleteDoc, updateDoc,
-  query, orderBy
+  query
 } from '@firebase/firestore'
 import {db} from './firebase/index.js';
 
@@ -151,13 +194,15 @@ export default {
     // contacts
     const contacts = ref ([])
     const showModal = ref(false)
+    const showEditModal = ref(false)
     const SuccessAddingContact = ref(false)
+    const SuccessEditingContact = ref(false)
     const SuccessDeletingContact = ref(false)
 
     const first_name = ref('')
     const last_name = ref('')
     const phone_number = ref('')
-
+    
     onMounted(()=>{
       onSnapshot(contactsCollectionQuery, (querySnapshot) => {
         const fetchedContacts = []
@@ -175,7 +220,7 @@ export default {
       })
     })
 
-    return { contacts, showModal, first_name, last_name, phone_number, SuccessAddingContact, SuccessDeletingContact }
+    return { contacts, showModal, first_name, last_name, phone_number, SuccessAddingContact, SuccessDeletingContact, showEditModal, SuccessEditingContact }
   },
   methods: {
     addContact(){
@@ -191,6 +236,25 @@ export default {
       this.SuccessAddingContact = true;
     },
 
+    updateContact(id){
+      const contact = this.contacts.find((c) => c.id === id);
+      if (!contact) {
+        return;
+      }
+      const docRef = doc(db, "contacts", id);
+      updateDoc(docRef, contact)
+      contact.showEditModal = false;
+      this.SuccessEditingContact = true;
+      // .then(() => {
+      //   contact.showEditModal = false;
+      //   this.SuccessEditingContact = true;
+      //   console.log("Value of an Existing Document Field has been updated");
+      // })
+      // .catch(error => {
+      //     console.log(error);
+      // })
+      },
+
     deleteContact(id){
       deleteDoc(doc(contactsRef, id));
       this.SuccessDeletingContact = true;
@@ -200,6 +264,7 @@ export default {
       this.showModal = true;
       this.SuccessAddingContact = false;
       this.SuccessDeletingContact = false;
+      this.SuccessEditingContact = false;
     }
   },
 }
@@ -221,5 +286,13 @@ export default {
 }
 .center-heading {
   text-align: center;
+}
+
+.modal-card-title {
+  text-align: left !important;
+}
+
+.modal-card-body {
+  text-align: left !important;
 }
 </style>
