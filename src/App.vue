@@ -83,7 +83,7 @@
     <!-- search bar -->
     <div class="field mt-4">
       <div class="control has-icons-left has-icons-right">
-        <input class="input" type="text" placeholder="Search for contact by last name ...">
+        <input v-model="searchTerm" class="input" type="text" placeholder="Search for contact by last name ...">
         <span class="icon is-small is-left">
           <i class="fas fa-search-plus"></i>
         </span>
@@ -92,8 +92,12 @@
     <!-- end of search bar  -->
 
     <!-- card -->
+    <div v-if="isFilteredDataEmpty" style="display: flex; align-items: center; justify-content: center;">
+      <h3>No Contacts Available!</h3>
+    </div>
+
     <div
-      v-for="contact in contacts"
+      v-for="contact in filteredData"
       :key="contact.id"
     >
       <div class="card mt-4">
@@ -198,6 +202,7 @@ export default {
     const SuccessAddingContact = ref(false)
     const SuccessEditingContact = ref(false)
     const SuccessDeletingContact = ref(false)
+    const searchTerm = ref('')
 
     const first_name = ref('')
     const last_name = ref('')
@@ -220,7 +225,20 @@ export default {
       })
     })
 
-    return { contacts, showModal, first_name, last_name, phone_number, SuccessAddingContact, SuccessDeletingContact, showEditModal, SuccessEditingContact }
+    return { contacts, showModal, first_name, 
+      last_name, phone_number, SuccessAddingContact, 
+      SuccessDeletingContact, showEditModal, SuccessEditingContact, searchTerm 
+    }
+  },
+  computed: {
+    filteredData(){
+      return this.contacts.filter((item) => {
+        return item.last_name.toLowerCase().includes(this.searchTerm.toLocaleLowerCase());
+      })
+    },
+    isFilteredDataEmpty() {
+      return this.filteredData.length === 0;
+    },
   },
   methods: {
     addContact(){
